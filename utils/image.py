@@ -1,29 +1,14 @@
 from PIL import Image
 
-from os import listdir, makedirs
-from os.path import join as joinPaths
+from .files import ls
 
-
-def ls(path, fullpath=True):
-    '''List all visible files'''
-    def nameOrPath(name):
-        if fullpath:
-            return joinPaths(path, name)
-        else:
-            return name
-
-    return [nameOrPath(name) for name in listdir(path) if not name.startswith('.')]
-
-
-def scale(sourcePath, targetPath, toWidth):
-    im = Image.open(sourcePath)
+def scale(im, toWidth):
     wpercent = (toWidth / float(im.size[0]))
     toHeight = int((float(im.size[1]) * float(wpercent)))
     im = im.resize((toWidth, toHeight), Image.ANTIALIAS)
-    im.save(targetPath, quality=100)
+    return im
 
-
-def autoCropImage(imagePath, targetPath):
+def autoCropImage(im):
     '''Trims an image by cropping away black edges'''
     def isBlack(x, y):
         try:
@@ -31,8 +16,6 @@ def autoCropImage(imagePath, targetPath):
         except IndexError:
             return False
         return max(rgb) <= 10
-
-    im = Image.open(imagePath).convert('RGB')
 
     width, height = im.size
 
@@ -62,11 +45,9 @@ def autoCropImage(imagePath, targetPath):
                 leftX += 1
 
     cropped = im.crop(box=(leftX, upperY, rightX, lowerY))
-    cropped.save(targetPath)
+    return cropped
 
-
-
-def circleToSquare(imagePath, targetPath):
+def circleToSquare(im):
     '''Trims an image by cropping away black edges'''
     def isBlack(x, y):
         try:
@@ -74,8 +55,6 @@ def circleToSquare(imagePath, targetPath):
         except IndexError:
             return False
         return max(rgb) <= 10
-
-    im = Image.open(imagePath).convert('RGB')
 
     width, height = im.size
 
@@ -111,17 +90,4 @@ def circleToSquare(imagePath, targetPath):
             quarterHeight * 3
         )
     )
-    cropped.save(targetPath, quality=100)
-
-
-def centerCrop(sourcePath, targetPath, length):
-    im = Image.open(sourcePath)
-    im.thumbnail((length, length))
-    im.save(targetPath, 'jpeg', quality=100)
-
-for classPath in ls('./data/subset/'):
-    for imagePath in ls(classPath):
-        print('> ' + imagePath)
-        autoCropImage(imagePath, imagePath)
-        circleToSquare(imagePath, imagePath)
-        scale(imagePath, imagePath, 512)
+    return cropped

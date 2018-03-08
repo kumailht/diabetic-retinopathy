@@ -35,8 +35,8 @@ def imageCondition(imagePath):
 
 # Classify: train/images -> classified/class/images
 print('# Organizing images by class')
-classMap = getClassMap('./data/train.csv')
-sortFiles(classMap, './data/train/')
+# classMap = getClassMap('./data/train.csv')
+# sortFiles(classMap, './data/train/')
 
 # Create a subset
 print('# Picking a subset')
@@ -50,7 +50,7 @@ for classPath in ls('./data/subset/'):
         im = Image.open(imagePath).convert('RGB')
 
         im = autoCropImage(im)
-        im = circleToSquare(im)
+        # im = circleToSquare(im)
         im = scale(im, 512)
 
         im.save(imagePath, quality=100)
